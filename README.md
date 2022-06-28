@@ -9,7 +9,7 @@ Todos:
 - [x] live reload
 - [x] routes within the app/routes directory
 - [x] routes outside the app/routes directory
-- [ ] all the route filename conventions (like `.`, `[`, and `]`)
+- [x] all the route filename conventions (like `.`, `[`, and `]`)
 - [x] customizing the compilation of MDX (plugins etc).
 - [x] importing relative, absolute, and `~`-prefixed paths.
 - [ ] custom components\*
@@ -18,6 +18,40 @@ Todos:
 \*We already have support for custom components, just make a variable binding in the MDX file called `components` and that'll work. But it would be more sensible to say people need to `export` something called `components` and use that instead. This will be a little tricky, but totally possible.
 
 We're not going to be able to support importing MDX files inside JS files. That's out of scope.
+
+## How to use
+
+Update your _remix.config.js_ file to configure the MDX routes. The `mdxRoutes`
+function simply updates the default conventional route config to patch it up
+with the new compiled version. Import both the `mdxRoutes` function as well as
+`defineConventionalRoutes` from Remix.
+
+```js
+const { mdxRoutes } = require("./mdx-routes");
+const {
+  defineConventionalRoutes,
+} = require("@remix-run/dev/config/routesConvention");
+
+/**
+ * @type {import('@remix-run/dev').AppConfig}
+ */
+
+const ignoredRouteFiles = [".*", "**/*.css", "**/*.test.{js,jsx,ts,tsx}"];
+module.exports = {
+  devServerPort: 8002,
+  cacheDirectory: "./node_modules/.cache/remix",
+  ignoredRouteFiles: ["**/*"], // ignore everything in routes folder
+  routes: async (defineRoutes) => {
+    // get existing routes using conventional routes
+    const conventionalRoutes = defineConventionalRoutes(
+      "app",
+      ignoredRouteFiles
+    );
+    // updates any mdx routes with new compiled version
+    return await mdxRoutes(conventionalRoutes);
+  },
+};
+```
 
 ## frontmatter
 
