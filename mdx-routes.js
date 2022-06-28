@@ -18,7 +18,8 @@ async function mdxRoutes(
   for (const [key, route] of Object.entries(existingRoutes)) {
     if (!route.file.endsWith(".mdx")) continue;
     const cachePath = await compileMdxRoute(path.join("app", route.file));
-    const routeId = cachePath.replace(/\.mdx\.js$/, "");
+    const relativePath = path.relative(fromRoot("app"), cachePath);
+    const routeId = relativePath.replace(/\.mdx\.js$/, "");
     // add new compiled mdx route
     existingRoutes[routeId] = {
       ...existingRoutes[key],
@@ -41,14 +42,9 @@ async function compileMdxRoute(filePath) {
   const content = await fs.promises.readFile(filePath, "utf8");
   const hash = crypto.createHash("sha256").update(content).digest("hex");
 
-  const cachePath = `${fromRoot(
-    ".cache/mdx-routes",
-    filePath.replace(process.cwd(), "")
-  )}.js`;
-  const hashPath = `${fromRoot(
-    ".cache/mdx-routes",
-    filePath.replace(process.cwd(), "")
-  )}-${hash.substring(0, 8)}`;
+  const fileFromRoot = fromRoot(".cache/mdx-routes", filePath);
+  const cachePath = `${fileFromRoot}.js`;
+  const hashPath = `${fileFromRoot}-${hash.substring(0, 8)}`;
 
   // check if hashed file already exists in cache
   if (await fs.existsSync(hashPath)) {
