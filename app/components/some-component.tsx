@@ -1,3 +1,3 @@
 export function SomeComponent() {
-  return <div>This is sme component</div>;
+  return <div>This is some component</div>;
 }

@@ -8,14 +8,15 @@ headers:
   Cache-Control: no-cache
 ---
 
-import { SomeComponent } from "../components/some-component";
+import { SomeComponent } from "~/components/some-component";
 
 export const links = () => [{ rel: "icon", href: "https://fav.farm/🔥" }];
 
+{/* import this component to customize generated tags */}
 import { components } from "~/components/mdx-comps";
 
 # Hello Content!
 
-Hello world
+Hello world updated
 
 <SomeComponent />
